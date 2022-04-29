@@ -59,7 +59,7 @@ gpio.setmode(gpio.BCM)
 
 t10s = datetime.timedelta(seconds=10)
 t30s = datetime.timedelta(seconds=30)
-#horaltr_humid = datetime.datetime.now()   # define start tempo leitores de umidade
+horaltr_humid = datetime.datetime.now()   # define start tempo leitores de umidade
 horaltr_dht11 = datetime.datetime.now()    # define start tempo dht11
 horaltr_reserv = datetime.datetime.now()   # define start tempo ultrasomico reservatorio de agua
 
@@ -140,9 +140,9 @@ def dados_arduino(item):
     except:
         print(f"impossivel receber humidade do sensor{item}")
         return 0    
-
-                # Pegar dados do arduino e devolver uma variavel
+               
 def dados_reserv():
+                   # Pegar dados do arduino e devolver uma variavel
     try:
         arduino.write('a'.encode())
         msgr = float(arduino.readline()) #Lê os dados em formato de float
@@ -151,7 +151,8 @@ def dados_reserv():
     except:
         print(f"impossivel receber volume do reservatorio{item}")
         return 0    
-def get_data(tabela):
+
+def get_data():
     # ***************    função responsavel por pegar a ultima data do banco    *********************
     try:
         
@@ -161,7 +162,7 @@ def get_data(tabela):
 
         # lendo os dados
         cursor.execute(f"""
-        SELECT data{tabela} FROM {tabela} ORDER BY ID DESC LIMIT 1;
+        SELECT datahumid FROM humid ORDER BY ID DESC LIMIT 1;
         """)
 
         for linha in cursor.fetchall():
@@ -172,41 +173,37 @@ def get_data(tabela):
         pass
     
     return data
-def principal_humid():
 
-            # ***************    get humidade media    *********************
-    try:
-        
-        conn = create_connection(r"EstufaDB.db") # inicia conexão com o banco
-        #print(conn)
+# def principal_humid():
 
-        horaltr_humid = get_data(tb_humid)
+#             # ***************    get humidade media    *********************
+#     try:
 
-        print(f"data DB humid = {horaltr_humid}")
+#         horaltr_humid = get_data(tb_humid)
 
-        hora_atual = datetime.datetime.now()
+#         print(f"data DB humid = {horaltr_humid}")
 
-        st_humid = hora_atual - horaltr_humid
+#         hora_atual = datetime.datetime.now()
 
-        if st_humid > t10s:
-            humid_media = dados_humid()
-            horaltr_humid = datetime.datetime.now()   ### atualiza a hr da leitura
-            #print(f"{hora_atual} -- hora humid ")
+#         st_humid = hora_atual - horaltr_humid
+
+#         if st_humid > t10s:
+#             humid_media = dados_humid()
+#             horaltr_humid = datetime.datetime.now()   ### atualiza a hr da leitura
+#             #print(f"{hora_atual} -- hora humid ")
             
-            humid = (humid_media, hora_atual)
-            db_humid(conn, humid)
+#             humid = (humid_media, hora_atual)
+#             db_humid(conn, humid)
 
-            conn.close()
-        else:
-            #print("else")
-            pass
-    
-        conn.close()  # Finaliza a conexão com o banco
+#             conn.close()
+#         else:
+#             #print("else")
+#             pass
 
-    except:
-        pass
+#     except:
+#         pass
 
-    return      
+#     return      
 
 def dados_humid():
                       #Tratar dados da humidade da terra  
@@ -231,11 +228,10 @@ def dados_humid():
     except ZeroDivisionError:
         print('divisao impossivel')
     return humid_media
-
-
-                # realiza a leitura do DHT11        
+                  
 def dados_dht11(humid, temp):
-
+             # realiza a leitura do DHT11    
+             
     humid, temp = dht.read_retry(dht_sensor, pin_dht11)
     if humid is not None and temp is not None:
         humid = int(humid)
@@ -262,16 +258,34 @@ try:
         conectividade = mqtt_client_connect()   #inicia conexão mqtt
 
         if conectividade == True:    #valida se esta conectado ao broker
-            
-           
-            principal_humid()
 
-            #print(f"teste -- {humid_media} == ")
+            
+  # ***************    get humidade media    *********************
+
+            #horaltr_humid = get_data()
+
+            #print(f"data DB humid = {horaltr_humid}")
+
+            hora_atual = datetime.datetime.now()
+
+            st_humid = hora_atual - horaltr_humid
+
+            if st_humid > t10s:
+                humid_media = dados_humid()
+                horaltr_humid = datetime.datetime.now()   ### atualiza a hr da leitura
+                #print(f"{hora_atual} -- hora humid ")
+
+                conn = create_connection(r"EstufaDB.db")
+                
+                humid = (humid_media, hora_atual)
+                db_humid(conn, humid)
+
+                conn.close()
 
 
             # **************    get humid temp do dht11       ***********************
 
-            # humid, temp = dados_dht11(humid, temp)
+            #humid, temp = dados_dht11(humid, temp)
             hora_atual = datetime.datetime.now()
 
             st_dht11 = hora_atual - horaltr_dht11
