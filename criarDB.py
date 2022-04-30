@@ -23,6 +23,14 @@ CREATE TABLE dht11 (
 );
 """)
 
+cursor.execute("""
+CREATE TABLE reserv (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        reserv INTEGER,
+        datareserv DATETIME
+);
+""")
+
 print('Tabela criada com sucesso.')
 # desconectando...
 conn.close()

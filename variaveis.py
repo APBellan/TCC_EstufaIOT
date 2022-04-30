@@ -4,6 +4,8 @@ broker_url = "127.0.0.1"
 bkrMqtt = None
 
 cont_sensors_humid = ["1","2"]  # variavel que contem a quantidade de sensores ligados ao arduino
+lst_final_reserv = []
+res_final_reserv = None
 resultado_humidade = []
 lst_final_humid = []
 res_final_humid = None

@@ -111,6 +111,21 @@ def db_dht11(conn, dht11):
     conn.commit()
     return cur.lastrowid
 
+def db_reserv(conn, reserv):
+    """
+    Create a new reserv
+    :param conn:
+    :param reserv:
+    :return:
+    """
+
+    sql = ''' INSERT INTO resrv(reserv,datareserv)
+              VALUES(?,?) '''
+    cur = conn.cursor()
+    cur.execute(sql, reserv)
+    conn.commit()
+    return cur.lastrowid
+
 
                 # Pegar dados do arduino e devolver uma variavel
 def dados_arduino(item):
@@ -226,8 +241,6 @@ try:
                 humid_media = dados_humid()
                 horaltr_humid = dt.datetime.now()   ### atualiza a hr da leitura
                 #print(f"{hora_atual} -- hora humid ")
-
-
                 
                 humid = (humid_media, hora_atual)
                 db_humid(conn, humid)
@@ -269,9 +282,29 @@ try:
             st_reserv = hora_atual - horaltr_reserv
 
             if st_reserv > t10s:
-                reserv_media = dados_reserv()
+                reserv_dados = dados_reserv()
                 horaltr_reserv = dt.datetime.now()   ### atualiza a hr da leitura
                 print(hora_atual)
+
+                lst_final_reserv.append(reserv_dados)
+
+                qtd_dados_reserv= len(lst_final_reserv)
+
+                if qtd_dados_reserv >= 5:
+                    res_final_reserv = float(sum(lst_final_reserv) / qtd_dados_reserv)
+
+                    print(f'resultado da media do reserv = {res_final_reserv} ')
+
+                    lst_final_reserv.clear()
+                    # conn = create_connection(r"EstufaDB.db")
+
+                    # now = datetime.datetime.now()
+                    # reserv = (res_final_reserv, now)
+                    # db_reserb(conn, reserv)
+
+                else:
+                    pass
+
                 # conn = create_connection(r"EstufaDB.db")
 
                 # now = datetime.datetime.now()
@@ -299,7 +332,3 @@ except KeyboardInterrupt:
 finally:
 	print("ok.")
 print("Fim do programa.")
-
-
-### verificar para retirar os milesimos
-### ferificar tratar erro dht11 sem sinal
