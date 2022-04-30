@@ -5,35 +5,17 @@ import paho.mqtt.client as mqtt
 import serial
 import threading
 import time as time
-import datetime
-from datetime import date
+import datetime as dt
+from datetime import datetime
 import Adafruit_DHT as dht
 import sqlite3
 from sqlite3 import Error
-#from variaveis import *
+from variaveis import *
 
 
 ### variaveis
 
-temperature_topic = "t0th/temperature"
-humidity_topic = "t0th/humidity"
-broker_url = "127.0.0.1"
-bkrMqtt = None
 
-cont_sensors_humid = ["1","2"]  # variavel que contem a quantidade de sensores ligados ao arduino
-resultado_humidade = []
-lst_final_humid = []
-res_final_humid = None
-tb_humid = "humid"
-tb_dht11 = "dht11"
-hora_atual = None
-humid_media = None
-lidoard = None
-msg = None
-msgr = None
-humid = None
-temp = None
-hora1 = None
 
 
 ## fim das variaveis
@@ -57,11 +39,11 @@ gpio.setmode(gpio.BCM)
 
    # variaveis de tempo
 
-t10s = datetime.timedelta(seconds=10)
-t30s = datetime.timedelta(seconds=30)
-horaltr_humid = datetime.datetime.now()   # define start tempo leitores de umidade
-horaltr_dht11 = datetime.datetime.now()    # define start tempo dht11
-horaltr_reserv = datetime.datetime.now()   # define start tempo ultrasomico reservatorio de agua
+t10s = dt.timedelta(seconds=10)
+t30s = dt.timedelta(seconds=30)
+#horaltr_humid = datetime.datetime.now()   # define start tempo leitores de umidade
+horaltr_dht11 = dt.datetime.now()    # define start tempo dht11
+horaltr_reserv = dt.datetime.now()   # define start tempo ultrasomico reservatorio de agua
 
 
     #configuração DHT11
@@ -152,58 +134,26 @@ def dados_reserv():
         print(f"impossivel receber volume do reservatorio{item}")
         return 0    
 
-def get_data():
+def get_data(conn, tabela):
     # ***************    função responsavel por pegar a ultima data do banco    *********************
     try:
+            
+        #conn = create_connection(r"EstufaDB.db") # inicia conexão com o banco
+
+        cursor = conn.cursor()
         
-        conn = create_connection(r"EstufaDB.db") # inicia conexão com o banco
-
-        #   tabela = tb_humid
-
         # lendo os dados
         cursor.execute(f"""
-        SELECT datahumid FROM humid ORDER BY ID DESC LIMIT 1;
+        SELECT data{tabela} FROM {tabela} ORDER BY ID DESC LIMIT 1;
         """)
-
         for linha in cursor.fetchall():
             data = linha[0]
-    
-        conn.close()  # Finaliza a conexão com o banco
+        #print(data)
+        #conn.close()  # Finaliza a conexão com o banco
     except:
-        pass
+        print("erro DB data_humid")
     
-    return data
-
-# def principal_humid():
-
-#             # ***************    get humidade media    *********************
-#     try:
-
-#         horaltr_humid = get_data(tb_humid)
-
-#         print(f"data DB humid = {horaltr_humid}")
-
-#         hora_atual = datetime.datetime.now()
-
-#         st_humid = hora_atual - horaltr_humid
-
-#         if st_humid > t10s:
-#             humid_media = dados_humid()
-#             horaltr_humid = datetime.datetime.now()   ### atualiza a hr da leitura
-#             #print(f"{hora_atual} -- hora humid ")
-            
-#             humid = (humid_media, hora_atual)
-#             db_humid(conn, humid)
-
-#             conn.close()
-#         else:
-#             #print("else")
-#             pass
-
-#     except:
-#         pass
-
-#     return      
+    return data   
 
 def dados_humid():
                       #Tratar dados da humidade da terra  
@@ -258,24 +208,26 @@ try:
         conectividade = mqtt_client_connect()   #inicia conexão mqtt
 
         if conectividade == True:    #valida se esta conectado ao broker
-
             
   # ***************    get humidade media    *********************
 
-            #horaltr_humid = get_data()
+            conn = create_connection(r"EstufaDB.db")
+
+            horaltr_humid = get_data(conn, tb_humid)
+            horaltr_humid = datetime.strptime(horaltr_humid, '%Y-%m-%d %H:%M:%S.%f')
 
             #print(f"data DB humid = {horaltr_humid}")
 
-            hora_atual = datetime.datetime.now()
+            hora_atual = dt.datetime.now()
 
             st_humid = hora_atual - horaltr_humid
 
             if st_humid > t10s:
                 humid_media = dados_humid()
-                horaltr_humid = datetime.datetime.now()   ### atualiza a hr da leitura
+                horaltr_humid = dt.datetime.now()   ### atualiza a hr da leitura
                 #print(f"{hora_atual} -- hora humid ")
 
-                conn = create_connection(r"EstufaDB.db")
+
                 
                 humid = (humid_media, hora_atual)
                 db_humid(conn, humid)
@@ -286,35 +238,39 @@ try:
             # **************    get humid temp do dht11       ***********************
 
             #humid, temp = dados_dht11(humid, temp)
-            hora_atual = datetime.datetime.now()
+
+            conn = create_connection(r"EstufaDB.db")
+
+            horaltr_humid = get_data(conn, tb_dht11)
+            horaltr_humid = datetime.strptime(horaltr_humid, '%Y-%m-%d %H:%M:%S.%f')
+
+            hora_atual = dt.datetime.now()
 
             st_dht11 = hora_atual - horaltr_dht11
             
 
             if st_dht11 > t30s:
                 humid, temp = dados_dht11(humid, temp)
-                horaltr_dht11 = datetime.datetime.now() ### atualiza a hr da leitura
+                horaltr_dht11 = dt.datetime.now() ### atualiza a hr da leitura
                 print(hora_atual)
 
-                conn = create_connection(r"EstufaDB.db")
-
-                now = datetime.datetime.now()
+                now = dt.datetime.now()
                 dht11 = (temp, humid, now)
                 db_dht11(conn, dht11)
 
-                conn.close()
             else:
                 #print("else")
                 pass
+            
+            conn.close()
 
             # ***************    get volume do reservatorio    *********************
 
             st_reserv = hora_atual - horaltr_reserv
 
-
             if st_reserv > t10s:
                 reserv_media = dados_reserv()
-                horaltr_reserv = datetime.datetime.now()   ### atualiza a hr da leitura
+                horaltr_reserv = dt.datetime.now()   ### atualiza a hr da leitura
                 print(hora_atual)
                 # conn = create_connection(r"EstufaDB.db")
 

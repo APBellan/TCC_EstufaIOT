@@ -1,4 +1,3 @@
-
 temperature_topic = "t0th/temperature"
 humidity_topic = "t0th/humidity"
 broker_url = "127.0.0.1"
@@ -10,6 +9,8 @@ lst_final_humid = []
 res_final_humid = None
 tb_humid = "humid"
 tb_dht11 = "dht11"
+data = None
+horaltr_humid = None
 hora_atual = None
 humid_media = None
 lidoard = None
