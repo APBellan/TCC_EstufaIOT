@@ -42,7 +42,7 @@ gpio.setmode(gpio.BCM)
 t10s = dt.timedelta(seconds=10)
 t30s = dt.timedelta(seconds=30)
 #horaltr_humid = datetime.datetime.now()   # define start tempo leitores de umidade
-horaltr_dht11 = dt.datetime.now()    # define start tempo dht11
+#horaltr_dht11 = dt.datetime.now()    # define start tempo dht11
 horaltr_reserv = dt.datetime.now()   # define start tempo ultrasomico reservatorio de agua
 
 
@@ -122,17 +122,6 @@ def dados_arduino(item):
     except:
         print(f"impossivel receber humidade do sensor{item}")
         return 0    
-               
-def dados_reserv():
-                   # Pegar dados do arduino e devolver uma variavel
-    try:
-        arduino.write('a'.encode())
-        msgr = float(arduino.readline()) #Lê os dados em formato de float
-        print(f"valor lido do sensor: {msgr}%") #Imprime a mensagem
-        return msgr
-    except:
-        print(f"impossivel receber volume do reservatorio{item}")
-        return 0    
 
 def get_data(conn, tabela):
     # ***************    função responsavel por pegar a ultima data do banco    *********************
@@ -153,7 +142,18 @@ def get_data(conn, tabela):
     except:
         print("erro DB data_humid")
     
-    return data   
+    return data
+               
+def dados_reserv():
+                   # Pegar dados do arduino e devolver uma variavel
+    try:
+        arduino.write('a'.encode())
+        msgr = float(arduino.readline()) #Lê os dados em formato de float
+        print(f"valor lido do sensor: {msgr}%") #Imprime a mensagem
+        return msgr
+    except:
+        print(f"impossivel receber volume do reservatorio{item}")
+        return 0    
 
 def dados_humid():
                       #Tratar dados da humidade da terra  
@@ -174,10 +174,10 @@ def dados_humid():
         #print(resultado_humidade)
         humid_media = int(sum(resultado_humidade) / qtd_dados_humid) #gera a humidade média dos sensores
         #print(f'Humidade Média: {humid_media}%')
-    
+  
     except ZeroDivisionError:
         print('divisao impossivel')
-    return humid_media
+    return humid_media  
                   
 def dados_dht11(humid, temp):
              # realiza a leitura do DHT11    
@@ -241,8 +241,8 @@ try:
 
             conn = create_connection(r"EstufaDB.db")
 
-            horaltr_humid = get_data(conn, tb_dht11)
-            horaltr_humid = datetime.strptime(horaltr_humid, '%Y-%m-%d %H:%M:%S.%f')
+            horaltr_dht11 = get_data(conn, tb_dht11)
+            horaltr_dht11 = datetime.strptime(horaltr_dht11, '%Y-%m-%d %H:%M:%S.%f')
 
             hora_atual = dt.datetime.now()
 

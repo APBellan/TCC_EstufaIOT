@@ -2,7 +2,9 @@
 //***************             Humidade solo               ***************
 
 #define SECO 500 //VALOR MEDIDO COM O SOLO SECO 
-#define MOLHADO 160 //VALOR MEDIDO COM O SOLO MOLHADO 
+#define MOLHADO 160 //VALOR MEDIDO COM O SOLO MOLHADO
+#define VAZIO 20
+#define CHEIO 9 
 
 int TRIG = 7; // ********
 int ECHO = 8; // ********
@@ -20,6 +22,9 @@ double distance;
 
 int percSoloSeco = 0; //MENOR PERCENTUAL DO SOLO SECO 
 int percSoloMolhado = 100; //MAIOR PERCENTUAL DO SOLO MOLHADO 
+
+int percReservVazio = 0; //MENOR PERCENTUAL DO SOLO SECO 
+int percReservCheio = 100; //MAIOR PERCENTUAL DO SOLO MOLHADO 
  
 
 //    Configuração Sensor1
@@ -86,6 +91,8 @@ void loop(){
     } else {
       distance = -1;
     }
+
+    distance = map(distance,CHEIO,VAZIO,percReservCheio,percReservVazio); //EXECUTA A FUNÇÃO "map" DE ACORDO COM OS PARÂMETROS PASSADOS
   
     Serial.println(distance);
     delay(int(1000/sampling_rate));
