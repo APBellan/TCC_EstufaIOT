@@ -33,9 +33,19 @@ gpio.setmode(gpio.BCM)
 
 
     #rele1 / utilizado para ligar o cooler
-# rele1 = 12   
+# rele1 = 12
 # gpio.setup(rele1, gpio.OUT)
 # gpio.output(rele1, 1)
+
+    #rele2 / utilizado para ligar a irrigação
+# rele2 = definir pino   
+# gpio.setup(rele2, gpio.OUT)
+# gpio.output(rele2, 1)
+
+    #rele3 / utilizado para ligar a luz
+# rele3 = definir pino 
+# gpio.setup(rele3, gpio.OUT)
+# gpio.output(rele3, 1)
 
    # variaveis de tempo
 
@@ -119,13 +129,27 @@ def db_reserv(conn, reserv):
     :return:
     """
 
-    sql = ''' INSERT INTO resrv(reserv,datareserv)
+    sql = ''' INSERT INTO reserv(reserv,datareserv)
               VALUES(?,?) '''
     cur = conn.cursor()
     cur.execute(sql, reserv)
     conn.commit()
     return cur.lastrowid
 
+def db_irrig(conn, irrig):
+    """
+    Create a new reserv
+    :param conn:
+    :param reserv:
+    :return:
+    """
+
+    sql = ''' INSERT INTO reserv(reserv,datareserv)
+              VALUES(?,?) '''
+    cur = conn.cursor()
+    cur.execute(sql, reserv)
+    conn.commit()
+    return cur.lastrowid
 
                 # Pegar dados do arduino e devolver uma variavel
 def dados_arduino(item):
@@ -194,20 +218,20 @@ def dados_humid():
         print('divisao impossivel')
     return humid_media  
                   
-def dados_dht11(humid, temp):
+def dados_dht11(humid_dht11, temp):
              # realiza a leitura do DHT11    
              
-    humid, temp = dht.read_retry(dht_sensor, pin_dht11)
-    if humid is not None and temp is not None:
-        humid = int(humid)
+    humid_dht11, temp = dht.read_retry(dht_sensor, pin_dht11)
+    if humid_dht11 is not None and temp is not None:
+        humid_dht11 = int(humid_dht11)
         temp = int(temp)
-        print(f"Temperatura={temp}*C  Umidade={humid}%")
+        print(f"Temperatura={temp}*C  Umidade={humid_dht11}%")
         # bkrMqtt.publish(temperature_topic, temp)
         # bkrMqtt.publish(humidity_topic, humid)
     else:
         print("Falha ao receber os dados do sensor de umidade")
 
-    return humid, temp
+    return humid_dht11, temp
 
 #*********************************************************************************
             #******************    LOOP PRINCIPAL    ******************
@@ -263,14 +287,15 @@ try:
             
 
             if st_dht11 > t30s:
-                humid, temp = dados_dht11(humid, temp)
+                humid_dht11, temp = dados_dht11(humid_dht11, temp)
                 horaltr_dht11 = dt.datetime.now() ### atualiza a hr da leitura
                 print(hora_atual)
-
+            elif humid_dht11 < 100
                 now = dt.datetime.now()
-                dht11 = (temp, humid, now)
+                dht11 = (temp, humid_dht11, now)
                 db_dht11(conn, dht11)
-
+                
+                ativacooler = True
             else:
                 #print("else")
                 pass
@@ -296,32 +321,34 @@ try:
                     print(f'resultado da media do reserv = {res_final_reserv} ')
 
                     lst_final_reserv.clear()
-                    # conn = create_connection(r"EstufaDB.db")
+                    conn = create_connection(r"EstufaDB.db")
 
-                    # now = datetime.datetime.now()
-                    # reserv = (res_final_reserv, now)
-                    # db_reserb(conn, reserv)
+                    now = dt.datetime.now()
+                    reserv = (res_final_reserv, now)
+                    db_reserv(conn, reserv)
 
                 else:
                     pass
 
-                # conn = create_connection(r"EstufaDB.db")
-
-                # now = datetime.datetime.now()
-                # humid = (humid_media, now)
-                # db_humid(conn, humid)
-
-                # conn.close()
             else:
                 #print("else")
                 pass
 
-                  # utilizado para controle do cooler  
-            # if temp > 0.0:
-            #     print("cooler ligado")
-            #     gpio.output(rele1, 0)
-            # else:
-            #     gpio.output(rele1, 1)
+        #******************************************************#
+        # ******************* ATUADORES ********************** #
+        #******************************************************#
+
+            while ativacooler = True
+                    utilizado para controle do cooler  
+                if temp > 25:
+                    print("cooler ligado")
+                    gpio.output(rele1, 0)
+                else:
+                    gpio.output(rele1, 1)
+                    ativacooler = False
+
+            
+
 
         else:
             print("Espera por conectividade (10 segundos)")
