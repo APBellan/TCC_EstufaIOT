@@ -31,6 +31,14 @@ CREATE TABLE reserv (
 );
 """)
 
+cursor.execute("""
+CREATE TABLE irrig (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        irrig INTEGER,
+        datairrig DATETIME
+);
+""")
+
 print('Tabela criada com sucesso.')
 # desconectando...
 conn.close()

@@ -21,3 +21,4 @@ msgr = None
 humid = None
 temp = None
 hora1 = None
+ativacooler = False
