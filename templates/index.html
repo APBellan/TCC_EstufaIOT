@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- <h1>{% block title %} Welcome to Smart GreenHouse IOT {% endblock %}</h1> -->
+
+    <main class="cards">
+        <section class="card humid">
+            <div class="icon">
+            <img src="{{ url_for('static', filename= 'img/gotas.png') }}" alt="Humidade da Terra">
+            </div>
+            {% for post in posts_humid %}
+            <a href="{{ url_for('post_humid') }}">
+                <h2>Umidade</h2>
+            </a>
+    
+            <span  class="badge badge-dark">{{ post['humid'] }}%</span><br> 
+            <span class="badge badge-primary">{{ post['datahumid'] }}</span>
+     
+            <hr>
+            {% endfor %}
+
+        </section>
+        <section class="card dht11">
+            <!-- <div class="icon imgdht11"> -->
+            <img src="{{ url_for('static', filename= 'img/temphumid.png') }}" alt="Humidade e Temperatuda do AR">
+            <!-- </div> -->
+            {% for post in posts_dht11 %}
+            <a href="{{ url_for('post_dht11') }}">
+                <h2>Umidade e Temperatuda do ar</h2>
+            </a>
+    
+            <span  class="badge badge-dark">temp: {{ post['temp'] }}%  --  Humid: {{ post['humid'] }}%</span><br>
+
+            <span class="badge badge-primary">{{ post['datadht11'] }}</span>
+     
+            <hr>
+            {% endfor %}
+            
+        </section>
+        <section class="card reserv">
+            <div class="icon">
+            <img src="{{ url_for('static', filename= 'img/reserv.png') }}" alt="Reservatório de água">        
+            </div>    
+            {% for post in posts_reserv %}
+            <a>
+            <h2>Reservatório de água</h2>
+            </a>
+            <span  class="badge badge-dark">{{ post['reserv'] }}%</span><br>
+            <span class="badge badge-primary">{{ post['datareserv'] }}</span>
+     
+            <hr>
+            {% endfor %}
+            
+        </section>
+
+
+    </main>
+
+    
+{% endblock %}

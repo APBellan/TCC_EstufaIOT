@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %}Humidade {% endblock %}</h2>
+    {% for post in post_humid %}
+        <span class="badge badge-dark">{{ post['humid'] }}%</span>
+        <span class="badge badge-primary">{{ post['datahumid'] }}</span><br>
+    {% endfor %}
+{% endblock %}

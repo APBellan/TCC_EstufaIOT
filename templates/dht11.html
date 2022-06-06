@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %}Umidade e Temperatuda do AR {% endblock %}</h2>
+    {% for post in post_dht11 %}
+        <span class="badge badge-dark">Umidade {{ post['temp'] }}%</span>
+        <span class="badge badge-dark">Temperatuda {{ post['humid'] }}%</span>
+        <span class="badge badge-primary">{{ post['datadht11'] }}</span><br>
+    {% endfor %}
+{% endblock %}

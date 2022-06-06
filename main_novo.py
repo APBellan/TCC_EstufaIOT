@@ -269,6 +269,8 @@ try:
                 humid = (humid_media, hora_atual)
                 db_humid(conn, humid)
 
+                ativairrig = True
+
                 conn.close()
 
 
@@ -338,8 +340,9 @@ try:
         # ******************* ATUADORES ********************** #
         #******************************************************#
 
+
+                    #*** ativar cooler ***#
             while ativacooler = True
-                    utilizado para controle do cooler  
                 if temp > 25:
                     print("cooler ligado")
                     gpio.output(rele1, 0)
@@ -347,8 +350,15 @@ try:
                     gpio.output(rele1, 1)
                     ativacooler = False
 
-            
 
+                    #*** ativar irrig ***#
+            while ativairrig = True
+                if humid_media < 20:
+                    print("irrigação ligada")
+                    pio.output(rele2, 0)
+                else:
+                    gpio.output(rele2, 1)
+                    ativairrig = False
 
         else:
             print("Espera por conectividade (10 segundos)")
