@@ -4,10 +4,11 @@
     <!-- <h1>{% block title %} Welcome to Smart GreenHouse IOT {% endblock %}</h1> -->
 
     <main class="cards">
+        <div class="card_div">
         <section class="card humid">
-            <div class="icon">
+            <div>
             <img src="{{ url_for('static', filename= 'img/gotas.png') }}" alt="Humidade da Terra">
-            </div>
+
             {% for post in posts_humid %}
             <a href="{{ url_for('post_humid') }}">
                 <h2>Umidade</h2>
@@ -18,31 +19,34 @@
      
             <hr>
             {% endfor %}
-
+            </div>
         </section>
         <section class="card dht11">
-            <!-- <div class="icon imgdht11"> -->
+            
+
             <img src="{{ url_for('static', filename= 'img/temphumid.png') }}" alt="Humidade e Temperatuda do AR">
-            <!-- </div> -->
+
+
             {% for post in posts_dht11 %}
             <a href="{{ url_for('post_dht11') }}">
                 <h2>Umidade e Temperatuda do ar</h2>
             </a>
     
-            <span  class="badge badge-dark">temp: {{ post['temp'] }}%  --  Humid: {{ post['humid'] }}%</span><br>
+            <span  class="badge badge-dark">Temp: {{ post['temp'] }}%</span><br>
+            <span  class="badge badge-dark">Humid: {{ post['humid'] }}%</span><br>
 
             <span class="badge badge-primary">{{ post['datadht11'] }}</span>
      
             <hr>
             {% endfor %}
-            
+
         </section>
         <section class="card reserv">
-            <div class="icon">
+
             <img src="{{ url_for('static', filename= 'img/reserv.png') }}" alt="Reservatório de água">        
-            </div>    
+
             {% for post in posts_reserv %}
-            <a>
+            <a href="{{ url_for('post_reserv') }}">
             <h2>Reservatório de água</h2>
             </a>
             <span  class="badge badge-dark">{{ post['reserv'] }}%</span><br>
@@ -50,11 +54,26 @@
      
             <hr>
             {% endfor %}
-            
+
+        </section>
+        </div>
+    </main>
+    <div><h1>Comandos manuais</h1></div>
+    <main class="teste">
+        <div class="card_button">
+        <section class="button">
+                <a href="{{ url_for('index', teste='1') }}"><button class="button-74" role="button"><img src="{{ url_for('static', filename= 'img/irrig_button.png') }}" alt="Reservatório de água"> </button></a>
+        </section>
+        <section class="button">
+                <a href="{{ url_for('index', teste='2') }}"><button class="button-74" role="button"><img src="{{ url_for('static', filename= 'img/fan_button.png') }}" alt="Reservatório de água"> </button></a>
         </section>
 
-
+        <section class="button">
+                <a href="{{ url_for('index', teste='3') }}"><button class="button-74" role="button"><img src="{{ url_for('static', filename= 'img/luz_button.png') }}" alt="Reservatório de água"> </button></a>
+        </section>
+        </div>
     </main>
+
 
     
 {% endblock %}
