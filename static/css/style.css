@@ -38,7 +38,7 @@ main.cards .card_div {
     display: flex;
     flex-direction: row; 
     /* align-content: space-around; */
-    background-color: #b1c6e4;
+    /* background-color: #b1c6e4; */
 
     justify-content: center;
     align-items: center;
@@ -49,7 +49,7 @@ main.cards section.card {
     /* display: flex; */
     /* flex-direction: column; */
     /* align-items: center; */
-    padding: 1rem 1.5rem;
+    padding: 0rem 1.5rem;
     border-radius: 8px;
     max-width: 256px;
     min-width: 256px;
@@ -67,13 +67,15 @@ main.cards section.card a {
     opacity: 100%;
     position: relative;
     text-align: center;
+    color: #000000;
+    
 }
 
 main.cards section.card div {
     display: flex;
     flex-direction: column; 
     align-content: space-around;
-    background-color: #b1c6e4;
+    /* background-color: #b1c6e4; */
     text-align: center;
     justify-content: center;
     /* align-items: center; */
@@ -86,7 +88,6 @@ main.cards section.card span {
     opacity: 100%;
     position: relative;
     text-align: center;
-
 }
 
 main.cards section.card .badge.badge-dark {
@@ -95,19 +96,19 @@ main.cards section.card .badge.badge-dark {
 }
 
 main.cards section.card.humid {
-    background: linear-gradient(to right, #b1c6e4, #d6dfee);
+    background: linear-gradient(to right, #1D6CFA, #c6c9f7);
 }
 main.cards section.card.dht11 {
-    background: linear-gradient(to right, #b2ddac, #daf3d4);
+    background: linear-gradient(to right, #88AD32, #c6f7c9);
 }
 main.cards section.card.reserv {
-    background: linear-gradient(to right, #ddb3b3, #f5dfdf);
+    background: linear-gradient(to right, #B3311B, #F7CDC6);
 }
 
 
-main.cards section.card:first-child {
+/* main.cards section.card:first-child {
     margin-left: 0px;
-}
+} */
 
 main.cards section.card .icon {
     width: 64px;
@@ -145,7 +146,7 @@ main.teste section.button {
     /* display: flex;
     flex-direction: row; */
     /* align-items: center; */
-    padding: 1rem 1.5rem;
+    padding: 1rem 4rem;
     border-radius: 8px;
 
     margin-left: 32px;
@@ -158,7 +159,7 @@ main.teste .card_button {
     display: flex;
     flex-direction: row; 
     /* align-content: space-around; */
-    background-color: #b1c6e4;
+    /* background-color: #b1c6e4; */
 
     justify-content: center;
     align-items: center;
@@ -166,13 +167,13 @@ main.teste .card_button {
 
 }
 
-.center{
+/* .center{
     display: flex;
     flex-wrap: wrap;
     max-width: 1100px;
     margin: 0 auto;
     padding: 0 2%;
-}
+} */
 
 
 

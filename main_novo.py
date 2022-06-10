@@ -10,23 +10,106 @@ from datetime import datetime
 import Adafruit_DHT as dht
 import sqlite3
 from sqlite3 import Error
-from variaveis import *
+from flask import Flask, render_template, request, url_for, flash, redirect
+from werkzeug.exceptions import abort
+from variaveis import *    #iniciar variaveis iniciais -- Outras variaveis que não aparecem aqui 
+                           #                              estão definidas no arquivo variaveis.py
 
 
-### variaveis
+#*********************************************************************************
+            #******************    WEB APP    ******************
+#*********************************************************************************
+
+app = Flask(__name__)
+
+ ### Define a conexão com o banco de dados
+
+def get_db_connection():
+    conw = None
+    connw = sqlite3.connect(db_file)
+    connw.row_factory = sqlite3.Row
+
+    return connw
+
+ ### Apontamento de rotas
+@app.route('/')
+def index():
+
+    connw = get_db_connection()
+    posts_humid = connw.execute('SELECT * FROM humid ORDER BY ID DESC LIMIT 1').fetchall()
+    posts_dht11 = connw.execute('SELECT * FROM dht11 ORDER BY ID DESC LIMIT 1').fetchall()
+    posts_reserv = connw.execute('SELECT * FROM reserv ORDER BY ID DESC LIMIT 1').fetchall()
+    posts_log = connw.execute('SELECT * FROM log_estufa ORDER BY ID DESC LIMIT 5').fetchall()
+    connw.close()
+
+    try:
+        if request.args['teste'] == '1':
+            print("deu boaaaaa 111111111111")
+        elif request.args['teste'] == '2':
+            print("deu boaaaaa 222222222222")
+        elif request.args['teste'] == '3':
+            print("deu boaaaaa 333333333333")
+    except:
+        pass
+
+    return render_template('index.html', posts_humid=posts_humid, posts_dht11=posts_dht11, posts_reserv=posts_reserv, posts_log=posts_log)
+
+@app.route('/humid')
+def post_humid():
+    post_humid = get_post_humid()
+    return render_template('humid.html', post_humid=post_humid)
+
+@app.route('/dht11')
+def post_dht11():
+    post_dht11 = get_post_dht11()
+    return render_template('dht11.html', post_dht11=post_dht11)
+
+@app.route('/reserv')
+def post_reserv():
+    post_reserv = get_post_reserv()
+    return render_template('reserv.html', post_reserv=post_reserv)
+
+ ### Definições das funções WEB
+
+def get_post_humid():
+    connw = get_db_connection(r"EstufaDB.db")
+    post_humid = connw.execute('SELECT * FROM humid ORDER BY ID DESC LIMIT 17').fetchall()
+    connw.close()
+    print(post_humid)
+    if post_humid is None:
+        abort(404)
+    return post_humid
+
+def get_post_dht11():
+    connw = get_db_connection(r"EstufaDB.db")
+    post_dht11 = connw.execute('SELECT * FROM dht11 ORDER BY ID DESC LIMIT 17').fetchall()
+    connw.close()
+    if post_dht11 is None:
+        abort(404)
+    return post_dht11
+    
+def get_post_reserv():
+    connw = get_db_connection(r"EstufaDB.db")
+    post_reserv = connw.execute('SELECT * FROM reserv ORDER BY ID DESC LIMIT 17').fetchall()
+    connw.close()
+    if post_reserv is None:
+        abort(404)
+    return post_reserv
 
 
 
+#*********************************************************************************
+        #******************    Gerencimento da Estufa    ******************
+#*********************************************************************************
 
-## fim das variaveis
 
-                #iniciar variaveis iniciais -- Outras variaveis que não aparecem aqui 
-                #                              estão definidas no arquivo variaveis.py
 
     #Verificar variaveis
 arduino = serial.Serial('/dev/ttyACM0', 9600) #inicia a comunicação serial com o arduino
 dht_sensor = dht.DHT11
-bkrMqtt = mqtt.Client("ESTUFABROKER") # define o nome do cliente MQTT
+# bkrMqtt = mqtt.Client("ESTUFABROKER") # define o nome do cliente MQTT
+
+
 
                 # definição dos pinos
 gpio.setmode(gpio.BCM)
@@ -51,6 +134,11 @@ gpio.setmode(gpio.BCM)
 
 t10s = dt.timedelta(seconds=10)
 t30s = dt.timedelta(seconds=30)
+t01m = dt.timedelta(minutes=1)
+t05m = dt.timedelta(minutes=5)
+t10m = dt.timedelta(minutes=10)
+t30m = dt.timedelta(minutes=30)
+
 #horaltr_humid = datetime.datetime.now()   # define start tempo leitores de umidade
 #horaltr_dht11 = dt.datetime.now()    # define start tempo dht11
 horaltr_reserv = dt.datetime.now()   # define start tempo ultrasomico reservatorio de agua
@@ -60,21 +148,24 @@ horaltr_reserv = dt.datetime.now()   # define start tempo ultrasomico reservator
 pin_dht11 = 24 # DHT11  /  Biblioteca usa modo BCM
 
 
-        #******************    DEFINIÇÃO DAS FUNÇÕES    ******************
+#*********************************************************************************
+      #******************    Definições das funções    ******************
+#*********************************************************************************
 
-                # Conexão com o Broker MQTT Mosquitto
-def mqtt_client_connect():
-    try:
-        #print("connected to: ", broker_url)
-        bkrMqtt.connect(broker_url)
-        bkrMqtt.loop_start()
-        return True
-    except:
-        print("erro ao se conectar com o Broker MQTT")
-        pass
-    return False
+#                 # Conexão com o Broker MQTT Mosquitto
+# def mqtt_client_connect():
+#     try:
+#         #print("connected to: ", broker_url)
+#         bkrMqtt.connect(broker_url)
+#         bkrMqtt.loop_start()
+#         return True
+#     except:
+#         print("erro ao se conectar com o Broker MQTT")
+#         pass
+#     return
 
-                #
+
+ ### inicia conexão com o banco de dados
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
     conn = None
@@ -138,29 +229,19 @@ def db_reserv(conn, reserv):
 
 def db_irrig(conn, irrig):
     """
-    Create a new reserv
+    Create a new irrig
     :param conn:
-    :param reserv:
+    :param irrig:
     :return:
     """
 
-    sql = ''' INSERT INTO reserv(reserv,datareserv)
+    sql = ''' INSERT INTO irrig(irrig,datairrig)
               VALUES(?,?) '''
     cur = conn.cursor()
-    cur.execute(sql, reserv)
+    cur.execute(sql, irrig)
     conn.commit()
     return cur.lastrowid
 
-                # Pegar dados do arduino e devolver uma variavel
-def dados_arduino(item):
-    try:
-        arduino.write(item.encode())
-        msg = int(arduino.readline()) #Lê os dados em formato de inteiro
-        print(f"valor lido do sensor {item}: {msg}%") #Imprime a mensagem
-        return msg
-    except:
-        print(f"impossivel receber humidade do sensor{item}")
-        return 0    
 
 def get_data(conn, tabela):
     # ***************    função responsavel por pegar a ultima data do banco    *********************
@@ -182,6 +263,18 @@ def get_data(conn, tabela):
         print("erro DB data_humid")
     
     return data
+
+                # Pegar dados do arduino e devolver uma variavel
+def dados_arduino(item):
+    try:
+        arduino.write(item.encode())
+        msg = int(arduino.readline()) #Lê os dados em formato de inteiro
+        print(f"valor lido do sensor {item}: {msg}%") #Imprime a mensagem
+        return msg
+    except:
+        print(f"impossivel receber humidade do sensor{item}")
+        return 0    
+
                
 def dados_reserv():
                    # Pegar dados do arduino e devolver uma variavel

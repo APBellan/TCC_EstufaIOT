@@ -6,18 +6,18 @@
     <main class="cards">
         <div class="card_div">
         <section class="card humid">
-            <div>
-            <img src="{{ url_for('static', filename= 'img/gotas.png') }}" alt="Humidade da Terra">
 
+            <img src="{{ url_for('static', filename= 'img/gotas.png') }}" alt="Humidade da Terra">
+            <div>
             {% for post in posts_humid %}
             <a href="{{ url_for('post_humid') }}">
                 <h2>Umidade</h2>
             </a>
     
-            <span  class="badge badge-dark">{{ post['humid'] }}%</span><br> 
+            <span class="badge badge-dark">{{ post['humid'] }}%</span><br> 
             <span class="badge badge-primary">{{ post['datahumid'] }}</span>
      
-            <hr>
+
             {% endfor %}
             </div>
         </section>
@@ -26,43 +26,45 @@
 
             <img src="{{ url_for('static', filename= 'img/temphumid.png') }}" alt="Humidade e Temperatuda do AR">
 
-
+            <div class="car">
             {% for post in posts_dht11 %}
             <a href="{{ url_for('post_dht11') }}">
                 <h2>Umidade e Temperatuda do ar</h2>
             </a>
     
-            <span  class="badge badge-dark">Temp: {{ post['temp'] }}%</span><br>
-            <span  class="badge badge-dark">Humid: {{ post['humid'] }}%</span><br>
+            <span class="badge badge-dark">Temp: {{ post['temp'] }}%</span><br>
+            <span class="badge badge-dark">Humid: {{ post['humid'] }}%</span><br>
 
             <span class="badge badge-primary">{{ post['datadht11'] }}</span>
      
-            <hr>
-            {% endfor %}
 
+            {% endfor %}
+            </div>
         </section>
         <section class="card reserv">
 
             <img src="{{ url_for('static', filename= 'img/reserv.png') }}" alt="Reservatório de água">        
-
+            <div class="car">
             {% for post in posts_reserv %}
             <a href="{{ url_for('post_reserv') }}">
             <h2>Reservatório de água</h2>
             </a>
-            <span  class="badge badge-dark">{{ post['reserv'] }}%</span><br>
+            <span class="badge badge-dark">{{ post['reserv'] }}%</span><br>
             <span class="badge badge-primary">{{ post['datareserv'] }}</span>
      
-            <hr>
-            {% endfor %}
 
+            {% endfor %}
+            </div>
         </section>
-        </div>
+        </div class="car">
     </main>
+
+
     <div><h1>Comandos manuais</h1></div>
     <main class="teste">
         <div class="card_button">
         <section class="button">
-                <a href="{{ url_for('index', teste='1') }}"><button class="button-74" role="button"><img src="{{ url_for('static', filename= 'img/irrig_button.png') }}" alt="Reservatório de água"> </button></a>
+                <button type="button" class="button-74" role="button" data-toggle="modal" data-target="#exampleModal"><img src="{{ url_for('static', filename= 'img/irrig_button.png') }}" alt="Reservatório de água"> </button>
         </section>
         <section class="button">
                 <a href="{{ url_for('index', teste='2') }}"><button class="button-74" role="button"><img src="{{ url_for('static', filename= 'img/fan_button.png') }}" alt="Reservatório de água"> </button></a>
@@ -73,7 +75,32 @@
         </section>
         </div>
     </main>
+    <main>
+        <div><h1> Informações da Estufa</h1></div>
+        {% for post in posts_log %}
+        <h3> {{ post['post_log'] }}  </h3>
+        {% endfor %}
+    </main>
 
-
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="exampleModalLabel">Irrigação manual</h5>
+         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+         </button>
+       </div>
+       <div class="modal-body">
+         Você tem certeza que deseja iniciar a irrigação por 30 segundos?
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+         <a href="{{ url_for('index', teste='1') }}"><button type="button" class="btn btn-primary">Confirmar</button></a>
+       </div>
+     </div>
+   </div>
+ </div>
     
 {% endblock %}

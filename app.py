@@ -2,22 +2,28 @@ from flask import Flask, render_template, request, url_for, flash, redirect
 import sqlite3
 from werkzeug.exceptions import abort
 
+
 app = Flask(__name__)
 
+ ### Define a conexão com o banco de dados
+
 def get_db_connection():
-    conn = sqlite3.connect('EstufaDB.db')
-    conn.row_factory = sqlite3.Row
+    conw = None
+    connw = sqlite3.connect('EstufaDB.db')
+    connw.row_factory = sqlite3.Row
 
-    return conn
+    return connw
 
+ ### Apontamento de rotas
 @app.route('/')
 def index():
 
-    conn = get_db_connection()
-    posts_humid = conn.execute('SELECT * FROM humid ORDER BY ID DESC LIMIT 1').fetchall()
-    posts_dht11 = conn.execute('SELECT * FROM dht11 ORDER BY ID DESC LIMIT 1').fetchall()
-    posts_reserv = conn.execute('SELECT * FROM reserv ORDER BY ID DESC LIMIT 1').fetchall()
-    conn.close()
+    connw = get_db_connection()
+    posts_humid = connw.execute('SELECT * FROM humid ORDER BY ID DESC LIMIT 1').fetchall()
+    posts_dht11 = connw.execute('SELECT * FROM dht11 ORDER BY ID DESC LIMIT 1').fetchall()
+    posts_reserv = connw.execute('SELECT * FROM reserv ORDER BY ID DESC LIMIT 1').fetchall()
+    posts_log = connw.execute('SELECT * FROM log_estufa ORDER BY ID DESC LIMIT 5').fetchall()
+    connw.close()
 
     try:
         if request.args['teste'] == '1':
@@ -29,7 +35,7 @@ def index():
     except:
         pass
 
-    return render_template('index.html', posts_humid=posts_humid, posts_dht11=posts_dht11, posts_reserv=posts_reserv)
+    return render_template('index.html', posts_humid=posts_humid, posts_dht11=posts_dht11, posts_reserv=posts_reserv, posts_log=posts_log)
 
 @app.route('/humid')
 def post_humid():
@@ -46,40 +52,33 @@ def post_reserv():
     post_reserv = get_post_reserv()
     return render_template('reserv.html', post_reserv=post_reserv)
 
-@app.route('/push')
-def teste_push():
-    strprint = "DEU CERTOOOOOOOO _______________"
-    print(strprint)
-    
-
-    return render_template('index.html')
-
-# def teste(str_teste):
-#     str_teste = str_teste
-#     print(str_teste)
-
+ ### Definições das funções WEB
 
 def get_post_humid():
-    conn = get_db_connection()
-    post_humid = conn.execute('SELECT * FROM humid ORDER BY ID DESC LIMIT 17').fetchall()
-    conn.close()
+    connw = get_db_connection()
+    post_humid = connw.execute('SELECT * FROM humid ORDER BY ID DESC LIMIT 17').fetchall()
+    connw.close()
     print(post_humid)
     if post_humid is None:
         abort(404)
     return post_humid
 
 def get_post_dht11():
-    conn = get_db_connection()
-    post_dht11 = conn.execute('SELECT * FROM dht11 ORDER BY ID DESC LIMIT 17').fetchall()
-    conn.close()
+    connw = get_db_connection()
+    post_dht11 = connw.execute('SELECT * FROM dht11 ORDER BY ID DESC LIMIT 17').fetchall()
+    connw.close()
     if post_dht11 is None:
         abort(404)
     return post_dht11
     
 def get_post_reserv():
-    conn = get_db_connection()
-    post_reserv = conn.execute('SELECT * FROM reserv ORDER BY ID DESC LIMIT 17').fetchall()
-    conn.close()
+    connw = get_db_connection()
+    post_reserv = connw.execute('SELECT * FROM reserv ORDER BY ID DESC LIMIT 17').fetchall()
+    connw.close()
     if post_reserv is None:
         abort(404)
     return post_reserv
+
+
+
+    #validar a inclusão de uma pagina para marcar o inicio do cultivo, para poder apresentar 
